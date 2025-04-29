@@ -7,8 +7,7 @@ const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey('TU_CLAVE_API_SENDGRID_AQUI'); // Reemplaza con tu clave de SendGrid
 
 const app = express();
-const PORT = 3000;
-const HOST = "localhost";
+const PORT = process.env.PORT || 3000; // Usa el puerto proporcionado por Render o 3000 como fallback
 const API_URL = "https://www.inemsoledad.com.co/api"; // URL de tu backend actual
 
 // Habilitar CORS para permitir solicitudes desde la app Flutter
@@ -31,13 +30,12 @@ app.get("/status", (req, res) => {
 
 // Configuración del proxy para redirigir solicitudes al backend
 const proxyOptions = {
-    target: API_URL, // URL del backend
-    changeOrigin: true, // Cambia el origen de la solicitud para que coincida con el target
+    target: API_URL,
+    changeOrigin: true,
     pathRewrite: {
-        '^/api': '' // Elimina el prefijo /api de la URL (ajusta según necesidad)
+        '^/api': ''
     },
     onProxyReq: (proxyReq, req, res) => {
-        // Agregar o modificar headers si es necesario
         proxyReq.setHeader('X-Proxy-Origin', 'NodeJS-Proxy');
     },
     onError: (err, req, res) => {
@@ -77,6 +75,6 @@ app.post('/send-email', express.json(), async (req, res) => {
 });
 
 // Iniciar el servidor
-app.listen(PORT, HOST, () => {
-    console.log(`Proxy API running at ${HOST}:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Proxy API running on port ${PORT}`);
 });
